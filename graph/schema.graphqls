@@ -1,0 +1,30 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Pasien{
+  id: ID!
+  nik: String!
+  nama_lengkap: String!
+  alergi_obat: String
+}
+
+type Query{
+  profilPasien(id: ID!): Pasien!
+}
+
+input PasienInput{
+  nik: String!
+  nama_Lengkap: String!
+  alergi_obat: String
+
+}
+
+type Mutation{
+  buatPasien(input: PasienInput!): Pasien!
+  ubahPasien(id: ID!, input: PasienInput!): Pasien!
+  hapusPasien(id: ID!): Pasien!
+
+  login(username: String!, role: String!): String
+}
+

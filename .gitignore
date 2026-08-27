@@ -1,0 +1,18 @@
+# Binaries
+/puskesmas-api
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Environment variables
+.env
+
+# Vendor directory
+/vendor/
+
+# Go workspace file
+go.work
