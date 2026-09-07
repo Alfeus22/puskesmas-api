@@ -33,14 +33,20 @@ func (c *PasienController) RegisterPasien(w http.ResponseWriter, r *http.Request
 	}
 
 	// lempar ke service
-	err := c.service.DaftarPasienBaru(req.NIK, req.NamaLengkap, req.AlergiObat)
+	var alergiPtr *string
+
+	if req.AlergiObat != "" {
+		tmp := req.AlergiObat
+		alergiPtr = &tmp
+	}
+	result, err := c.service.DaftarPasienBaru(req.NIK, req.NamaLengkap, alergiPtr)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-
 	// balasan sukses
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Pasien berhasil didaftarkan"})
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Pasien berhasil didaftarkan", "data": result})
 }

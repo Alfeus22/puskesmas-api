@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -10,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 
 	"github.com/Alfeus22/puskesmas-api/graph"
 	"github.com/Alfeus22/puskesmas-api/internal/controller"
@@ -19,8 +22,22 @@ import (
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("gagal memuat file .env: %v", err)
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+
 	// 1. Koneksi Database
-	dsn := "root:@tcp(127.0.0.1:3306)/puskesmas_db"
+
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		log.Fatalf("Gagal Koneksi database: %v", err)

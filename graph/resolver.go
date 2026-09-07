@@ -1,6 +1,8 @@
 package graph
 
-import "github.com/Alfeus22/puskesmas-api/internal/storage"
+import (
+	"github.com/Alfeus22/puskesmas-api/internal/storage"
+)
 
 // This file will not be regenerated automatically.
 //

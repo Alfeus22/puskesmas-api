@@ -17,6 +17,6 @@ type PasienInput struct {
 	NamaLengkap string  `json:"nama_Lengkap"`
 	AlergiObat  *string `json:"alergi_obat,omitempty"`
 }
-
+	
 type Query struct {
 }

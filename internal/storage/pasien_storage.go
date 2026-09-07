@@ -76,6 +76,6 @@ func (s *PasienStorage) CreatePasienTx(tx *sqlx.Tx, pasien *Pasien) error {
 // fungsi update/ modifikasi pasien
 func (s *PasienStorage) UpdatePasienTx(tx *sqlx.Tx, id string, pasien *Pasien) error {
 	query := `UPDATE pasien SET nik = ?, nama_Lengkap = ?, alergi_obat = ? WHERE id = ?`
-	_, err := tx.Exec(query, pasien.ID, pasien.NamaLengkap, pasien.AlergiObat, id)
+	_, err := tx.Exec(query, pasien.NIK, pasien.NamaLengkap, pasien.AlergiObat, id)
 	return err
 }

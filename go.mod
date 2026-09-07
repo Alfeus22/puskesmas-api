@@ -18,6 +18,7 @@ require (
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/sosodev/duration v1.4.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 )
