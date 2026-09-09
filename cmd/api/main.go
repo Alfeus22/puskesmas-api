@@ -15,7 +15,6 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/Alfeus22/puskesmas-api/graph"
-	"github.com/Alfeus22/puskesmas-api/internal/controller"
 	authMid "github.com/Alfeus22/puskesmas-api/internal/middleware"
 	"github.com/Alfeus22/puskesmas-api/internal/service"
 	"github.com/Alfeus22/puskesmas-api/internal/storage"
@@ -34,7 +33,7 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	// 1. Koneksi Database
 
@@ -47,7 +46,6 @@ func main() {
 	// 2. Dependency Injection (Merakit Layer)
 	pasienStorage := storage.NewPasienStorage(db)
 	pasienService := service.NewPasienService(pasienStorage)
-	pasienController := controller.NewPasienController(pasienService)
 
 	// 3. Setup Router menggunakan Chi
 	r := chi.NewRouter()
@@ -57,13 +55,10 @@ func main() {
 	r.Use(middleware.Recoverer) // Mencegah server mati jika panic/bug
 	r.Use(authMid.AuthMiddleware())
 
-	// 4. Mendaftarkan Route REST API (Lama)
-	r.Post("/pasien", pasienController.RegisterPasien)
-
 	// 5. RUTE GRAPHQL (Baru)
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{
-			PasienStorage: pasienStorage,
+			PasienService: pasienService,
 		},
 	}))
 

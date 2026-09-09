@@ -11,85 +11,38 @@ import (
 
 	"github.com/Alfeus22/puskesmas-api/graph/model"
 	"github.com/Alfeus22/puskesmas-api/internal/middleware"
-	"github.com/Alfeus22/puskesmas-api/internal/storage"
 	"github.com/Alfeus22/puskesmas-api/pkg/utils"
-	"github.com/google/uuid"
 )
 
 // BuatPasien is the resolver for the buatPasien field.
 func (r *mutationResolver) BuatPasien(ctx context.Context, input model.PasienInput) (*model.Pasien, error) {
-	pasienBaru := &storage.Pasien{
-		ID:          uuid.New().String(),
-		NIK:         input.Nik,
-		NamaLengkap: input.NamaLengkap,
-	}
-	if input.AlergiObat != nil {
-		pasienBaru.AlergiObat = input.AlergiObat
-	}
-	tx, err := r.PasienStorage.StartTransaction()
+	pasien, err := r.PasienService.DaftarPasienBaru(input.Nik, input.NamaLengkap, input.AlergiObat)
 	if err != nil {
 		return nil, err
 	}
-
-	defer tx.Rollback()
-
-	err = r.PasienStorage.CreatePasienTx(tx, pasienBaru)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
 	hasil := &model.Pasien{
-		ID:          pasienBaru.ID,
-		Nik:         pasienBaru.NIK,
-		NamaLengkap: pasienBaru.NamaLengkap,
-	}
-	if pasienBaru.AlergiObat != nil {
-		hasil.AlergiObat = utils.NullableString(*pasienBaru.AlergiObat)
+		ID:          pasien.ID,
+		Nik:         pasien.NIK,
+		NamaLengkap: pasien.NamaLengkap,
+		AlergiObat:  pasien.AlergiObat,
 	}
 	return hasil, nil
 }
 
 // UbahPasien is the resolver for the ubahPasien field.
 func (r *mutationResolver) UbahPasien(ctx context.Context, id string, input model.PasienInput) (*model.Pasien, error) {
-	pasienUpdate := &storage.Pasien{
-		NIK:         input.Nik,
-		NamaLengkap: input.NamaLengkap,
-	}
-	if input.AlergiObat != nil {
-		pasienUpdate.AlergiObat = input.AlergiObat
-	}
-
-	tx, err := r.PasienStorage.StartTransaction()
+	ubahPasien, err := r.PasienService.UpdatePasien(id, input.Nik, input.NamaLengkap, input.AlergiObat)
 	if err != nil {
 		return nil, err
 	}
-
-	defer tx.Rollback()
-
-	err = r.PasienStorage.UpdatePasienTx(tx, id, pasienUpdate)
-	if err != nil {
-		return nil, err
+	update := &model.Pasien{
+		ID:          ubahPasien.ID,
+		Nik:         ubahPasien.NIK,
+		NamaLengkap: ubahPasien.NamaLengkap,
+		AlergiObat:  ubahPasien.AlergiObat,
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	hasil := &model.Pasien{
-		ID:          id,
-		Nik:         pasienUpdate.NIK,
-		NamaLengkap: pasienUpdate.NamaLengkap,
-	}
-	if pasienUpdate.AlergiObat != nil {
-		hasil.AlergiObat = utils.NullableString(*pasienUpdate.AlergiObat)
-	}
-	return hasil, nil
+	return update, nil
 }
 
 // HapusPasien is the resolver for the hapusPasien field.
@@ -97,42 +50,21 @@ func (r *mutationResolver) HapusPasien(ctx context.Context, id string) (*model.P
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
-		return nil, errors.New("akses ditolak silahkan login terlebih dahulu")
+		return nil, errors.New("silahkan login dulu")
 	}
 	if user.Role != "admin" {
-		return nil, errors.New("akes ditolak: khusus admin yang dapat menghapus data")
+		return nil, errors.New("akses ditolak")
 	}
-
-	dataPasien, err := r.PasienStorage.GetByID(id)
+	hapusPasien, err := r.PasienService.SoftDeletePasien(id)
 	if err != nil {
 		return nil, err
 	}
 
-	tx, err := r.PasienStorage.StartTransaction()
-	if err != nil {
-		return nil, err
+	softDelete := &model.Pasien{
+		ID: hapusPasien.ID,
 	}
+	return softDelete, nil
 
-	defer tx.Rollback()
-
-	err = r.PasienStorage.SoftDeleteTx(tx, id)
-	if err != nil {
-		return nil, err
-	}
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	hasil := &model.Pasien{
-		ID:          dataPasien.ID,
-		Nik:         dataPasien.NIK,
-		NamaLengkap: dataPasien.NamaLengkap,
-	}
-	if dataPasien.AlergiObat != nil {
-		hasil.AlergiObat = utils.NullableString(*dataPasien.AlergiObat)
-	}
-	return hasil, nil
 }
 
 // Login is the resolver for the login field.
@@ -147,7 +79,7 @@ func (r *mutationResolver) Login(ctx context.Context, username string, role stri
 
 // ProfilPasien is the resolver for the profilPasien field.
 func (r *queryResolver) ProfilPasien(ctx context.Context, id string) (*model.Pasien, error) {
-	dataPasien, err := r.PasienStorage.GetByID(id)
+	dataPasien, err := r.PasienService.GetById(id)
 	if err != nil {
 		return nil, err
 	}

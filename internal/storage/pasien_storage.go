@@ -75,7 +75,28 @@ func (s *PasienStorage) CreatePasienTx(tx *sqlx.Tx, pasien *Pasien) error {
 
 // fungsi update/ modifikasi pasien
 func (s *PasienStorage) UpdatePasienTx(tx *sqlx.Tx, id string, pasien *Pasien) error {
-	query := `UPDATE pasien SET nik = ?, nama_Lengkap = ?, alergi_obat = ? WHERE id = ?`
+	query := `UPDATE pasien SET nik = ?, nama_lengkap = ?, alergi_obat = ? WHERE id = ?`
 	_, err := tx.Exec(query, pasien.NIK, pasien.NamaLengkap, pasien.AlergiObat, id)
 	return err
+}
+
+func (s *PasienStorage) GetAllPasienTx(limit, offset int) ([]*Pasien, error) {
+	var pasiens []*Pasien
+	query := `SELECT id,nik,nama_lengkap,alergi_obat FROM pasien WHERE is_deleted = 0 LIMIT ? OFFSET ?`
+	err := s.db.Select(&pasiens, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	return pasiens, nil
+}
+
+func (s *PasienStorage) CountPasien() (int, error) {
+	var count int
+	query := `SELECT COUNT(*) FROM pasien WHERE is_deleted = 0`
+	err := s.db.Get(&count, query)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

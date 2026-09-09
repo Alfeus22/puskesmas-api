@@ -1,8 +1,6 @@
 package graph
 
-import (
-	"github.com/Alfeus22/puskesmas-api/internal/storage"
-)
+import "github.com/Alfeus22/puskesmas-api/internal/service"
 
 // This file will not be regenerated automatically.
 //
@@ -10,5 +8,5 @@ import (
 // here.
 
 type Resolver struct {
-	PasienStorage *storage.PasienStorage
+	PasienService *service.PasienService
 }
