@@ -73,3 +73,27 @@ func (s *DokterService) GetDokterById(id string) (*storage.Dokter, error) {
 
 	return hasil, nil
 }
+
+func (s *DokterService) EditDokter(id string, nid string, nama string) (*storage.Dokter, error) {
+	tx, err := s.storage.StartTransactionTx()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	updateDokter := &storage.Dokter{
+		ID:   id,
+		NID:  nid,
+		Nama: nama,
+	}
+	err = s.storage.UpdateDokterTx(tx.Tx, id, updateDokter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+	return updateDokter, nil
+
+}

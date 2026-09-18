@@ -29,6 +29,20 @@ func (r *mutationResolver) BuatDokter(ctx context.Context, input model.DokterInp
 	return hasil, err
 }
 
+// UbahDokter is the resolver for the ubahDokter field.
+func (r *mutationResolver) UbahDokter(ctx context.Context, id string, input model.DokterInput) (*model.Dokter, error) {
+	ubahDokter, err := r.DokterService.EditDokter(id, input.Nid, input.Nama)
+	if err != nil {
+		return nil, err
+	}
+	update := &model.Dokter{
+		ID:   ubahDokter.ID,
+		Nid:  ubahDokter.NID,
+		Nama: ubahDokter.Nama,
+	}
+	return update, nil
+}
+
 // BuatPasien is the resolver for the buatPasien field.
 func (r *mutationResolver) BuatPasien(ctx context.Context, input model.PasienInput) (*model.Pasien, error) {
 	pasien, err := r.PasienService.DaftarPasienBaru(input.Nik, input.NamaLengkap, input.AlergiObat)
@@ -132,15 +146,3 @@ type (
 	mutationResolver struct{ *Resolver }
 	queryResolver    struct{ *Resolver }
 )
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) ProfilDosen(ctx context.Context, id string) (*model.Dokter, error) {
-	panic(fmt.Errorf("not implemented: ProfilDosen - profilDosen"))
-}
-*/

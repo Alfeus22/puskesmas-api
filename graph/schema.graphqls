@@ -13,11 +13,21 @@ type Dokter{
   nid: String!
   nama: String!
 }
+type Kunjungan{
+  id: ID!
+  id_dokter: ID!
+  id_pasien: ID!
+  tanggal_kunjungan: String!
+  keluhan: String
+  dokter: Dokter!
+  pasien: Pasien!
+}
 
 type Query{
   profilPasien(id: ID!): Pasien!
   profilDokter(id : ID!): Dokter!
-
+  kunjunganByPasien(idPasien: ID!): [Kunjungan!]!
+  kunjunganByDokter(idDokter: ID!): [Kunjungan!]!
 }
 input DokterInput {
   nid : String!
@@ -28,14 +38,24 @@ input PasienInput{
   nama_Lengkap: String!
   alergi_obat: String
 }
+input KunjunganInput{
+  id_dokter: ID!
+  id_pasien: ID!
+  tanggal_kunjungan: String!
+  keluhan: String
+}
 
 type Mutation{
 
   buatDokter(input: DokterInput!): Dokter!
+  ubahDokter(id: ID!, input: DokterInput!): Dokter!
 
   buatPasien(input: PasienInput!): Pasien!
   ubahPasien(id: ID!, input: PasienInput!): Pasien!
   hapusPasien(id: ID!): Pasien!
+
+  buatKunjungan(input: KunjunganInput!): Kunjungan!
+  hapusKunjungan(id: ID!): Kunjungan!
 
   login(username: String!, role: String!): String
 }
