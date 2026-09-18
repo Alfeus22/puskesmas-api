@@ -9,4 +9,5 @@ import "github.com/Alfeus22/puskesmas-api/internal/service"
 
 type Resolver struct {
 	PasienService *service.PasienService
+	DokterService *service.DokterService
 }
