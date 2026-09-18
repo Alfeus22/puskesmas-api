@@ -8,19 +8,31 @@ type Pasien{
   nama_lengkap: String!
   alergi_obat: String
 }
+type Dokter{
+  id: ID!
+  nid: String!
+  nama: String!
+}
 
 type Query{
   profilPasien(id: ID!): Pasien!
-}
+  profilDokter(id : ID!): Dokter!
 
+}
+input DokterInput {
+  nid : String!
+  nama : String!
+}
 input PasienInput{
   nik: String!
   nama_Lengkap: String!
   alergi_obat: String
-
 }
 
 type Mutation{
+
+  buatDokter(input: DokterInput!): Dokter!
+
   buatPasien(input: PasienInput!): Pasien!
   ubahPasien(id: ID!, input: PasienInput!): Pasien!
   hapusPasien(id: ID!): Pasien!

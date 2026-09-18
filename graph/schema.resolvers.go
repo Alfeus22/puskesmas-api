@@ -14,6 +14,21 @@ import (
 	"github.com/Alfeus22/puskesmas-api/pkg/utils"
 )
 
+// BuatDokter is the resolver for the buatDokter field.
+func (r *mutationResolver) BuatDokter(ctx context.Context, input model.DokterInput) (*model.Dokter, error) {
+	dokter, err := r.DokterService.DaftarDokterBaru(input.Nid, input.Nama)
+	if err != nil {
+		return nil, err
+	}
+
+	hasil := &model.Dokter{
+		ID:   dokter.ID,
+		Nid:  dokter.NID,
+		Nama: dokter.Nama,
+	}
+	return hasil, err
+}
+
 // BuatPasien is the resolver for the buatPasien field.
 func (r *mutationResolver) BuatPasien(ctx context.Context, input model.PasienInput) (*model.Pasien, error) {
 	pasien, err := r.PasienService.DaftarPasienBaru(input.Nik, input.NamaLengkap, input.AlergiObat)
@@ -47,7 +62,6 @@ func (r *mutationResolver) UbahPasien(ctx context.Context, id string, input mode
 
 // HapusPasien is the resolver for the hapusPasien field.
 func (r *mutationResolver) HapusPasien(ctx context.Context, id string) (*model.Pasien, error) {
-
 	user := middleware.ForContext(ctx)
 	if user == nil {
 		return nil, errors.New("silahkan login dulu")
@@ -64,7 +78,6 @@ func (r *mutationResolver) HapusPasien(ctx context.Context, id string) (*model.P
 		ID: hapusPasien.ID,
 	}
 	return softDelete, nil
-
 }
 
 // Login is the resolver for the login field.
@@ -74,7 +87,6 @@ func (r *mutationResolver) Login(ctx context.Context, username string, role stri
 		return nil, err
 	}
 	return &token, nil
-
 }
 
 // ProfilPasien is the resolver for the profilPasien field.
@@ -95,6 +107,21 @@ func (r *queryResolver) ProfilPasien(ctx context.Context, id string) (*model.Pas
 	return hasil, nil
 }
 
+// ProfilDokter is the resolver for the profilDokter field.
+func (r *queryResolver) ProfilDokter(ctx context.Context, id string) (*model.Dokter, error) {
+	dataDokter, err := r.DokterService.GetDokterById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	hasil := &model.Dokter{
+		ID:   dataDokter.ID,
+		Nid:  dataDokter.NID,
+		Nama: dataDokter.Nama,
+	}
+	return hasil, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -105,3 +132,15 @@ type (
 	mutationResolver struct{ *Resolver }
 	queryResolver    struct{ *Resolver }
 )
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) ProfilDosen(ctx context.Context, id string) (*model.Dokter, error) {
+	panic(fmt.Errorf("not implemented: ProfilDosen - profilDosen"))
+}
+*/

@@ -46,6 +46,8 @@ func main() {
 	// 2. Dependency Injection (Merakit Layer)
 	pasienStorage := storage.NewPasienStorage(db)
 	pasienService := service.NewPasienService(pasienStorage)
+	dokterStorage := storage.NewDokterStorage(db)
+	dokterService := service.NewDokterService(dokterStorage)
 
 	// 3. Setup Router menggunakan Chi
 	r := chi.NewRouter()
@@ -59,6 +61,7 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{
 			PasienService: pasienService,
+			DokterService: dokterService,
 		},
 	}))
 

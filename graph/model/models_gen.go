@@ -2,6 +2,17 @@
 
 package model
 
+type Dokter struct {
+	ID   string `json:"id"`
+	Nid  string `json:"nid"`
+	Nama string `json:"nama"`
+}
+
+type DokterInput struct {
+	Nid  string `json:"nid"`
+	Nama string `json:"nama"`
+}
+
 type Mutation struct {
 }
 
