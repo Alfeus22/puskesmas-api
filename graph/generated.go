@@ -48,6 +48,7 @@ type ComplexityRoot struct {
 		BuatPasien  func(childComplexity int, input model.PasienInput) int
 		HapusPasien func(childComplexity int, id string) int
 		Login       func(childComplexity int, username string, role string) int
+		UbahDokter  func(childComplexity int, id string, input model.DokterInput) int
 		UbahPasien  func(childComplexity int, id string, input model.PasienInput) int
 	}
 
@@ -70,6 +71,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	BuatDokter(ctx context.Context, input model.DokterInput) (*model.Dokter, error)
+	UbahDokter(ctx context.Context, id string, input model.DokterInput) (*model.Dokter, error)
 	BuatPasien(ctx context.Context, input model.PasienInput) (*model.Pasien, error)
 	UbahPasien(ctx context.Context, id string, input model.PasienInput) (*model.Pasien, error)
 	HapusPasien(ctx context.Context, id string) (*model.Pasien, error)
@@ -161,6 +163,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.Login(childComplexity, args["username"].(string), args["role"].(string)), true
+	case "Mutation.ubahDokter":
+		if e.ComplexityRoot.Mutation.UbahDokter == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_ubahDokter_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UbahDokter(childComplexity, args["id"].(string), args["input"].(model.DokterInput)), true
 	case "Mutation.ubahPasien":
 		if e.ComplexityRoot.Mutation.UbahPasien == nil {
 			break
@@ -531,6 +544,28 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_ubahDokter_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (model.DokterInput, error) {
+			return ec.unmarshalNDokterInput2githubᚗcomᚋAlfeus22ᚋpuskesmasᚑapiᚋgraphᚋmodelᚐDokterInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_ubahPasien_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -762,6 +797,50 @@ func (ec *executionContext) fieldContext_Mutation_buatDokter(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_buatDokter_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_ubahDokter(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_ubahDokter(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UbahDokter(ctx, fc.Args["id"].(string), fc.Args["input"].(model.DokterInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Dokter) graphql.Marshaler {
+			return ec.marshalNDokter2ᚖgithubᚗcomᚋAlfeus22ᚋpuskesmasᚑapiᚋgraphᚋmodelᚐDokter(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_ubahDokter(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Dokter(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_ubahDokter_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2419,6 +2498,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "buatDokter":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_buatDokter(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ubahDokter":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_ubahDokter(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

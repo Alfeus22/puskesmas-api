@@ -72,3 +72,9 @@ func (s *DokterStorage) CountDokter() (int, error) {
 	}
 	return jumlahDokter, nil
 }
+
+func (s *DokterStorage) UpdateDokterTx(tx *sql.Tx, id string, dokter *Dokter) error {
+	query := `UPDATE set nid = ?, nama = ? WHERE id = ?`
+	_, err := tx.Exec(query, dokter.NID, dokter.Nama)
+	return err
+}
